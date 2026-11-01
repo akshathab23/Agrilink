@@ -179,7 +179,7 @@ Agrilink/
 
 ### 1. Clone the Repository
 ```bash
-git clone <your-repository-url>
+git clone https://github.com/akshathab23/Agrilink.git
 cd Agrilink
 ```
 
@@ -355,13 +355,13 @@ The following features represent planned future work and are not yet present in 
 
 ## 👤 Author & Acknowledgments
 
-- **Author:** [Your Name / Project Contributor Placeholder]
-- **GitHub:** [@your-github-username](https://github.com/your-github-username)
-- **Institution / Program:** [Your College / University / Program Placeholder]
+- **Developed by:** Akshatha B
+- **GitHub Profile:** [akshathab23](https://github.com/akshathab23)
+- **Project Repository:** [AgriLink](https://github.com/akshathab23/Agrilink)
 - **Dataset Attribution:** Wholesale agricultural market data sourced from the **Agmarknet** portal (Directorate of Marketing & Inspection, Ministry of Agriculture and Farmers Welfare, Government of India).
 
 ---
 
 ## 📄 License
 
-This repository is currently maintained for academic demonstration and portfolio evaluation. An appropriate open-source license (e.g., MIT License or Apache 2.0) will be designated upon public release.
+This project is currently maintained for academic demonstration and portfolio purposes. License terms will be added when an appropriate open-source license is selected.
