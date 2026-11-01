@@ -1,8 +1,10 @@
 # 🌾 AgriLink: Transparent Digital Agricultural Marketplace
 
-🌐 **Live Demo:** [AgriLink – Visit Website](https://agrilink-pn3i.onrender.com)
-
 > A secure, role-based agricultural platform connecting **Farmers**, **Village Collection Centre Operators**, and **Commodity Buyers** through verified crop listings, standardized physical quality grading, automated demand-supply matching, and transparent mandi price discovery.
+
+### 🔗 Project Links
+- 🌐 **Live Demo:** [Visit AgriLink](https://agrilink-pn3i.onrender.com/)
+- 💻 **GitHub Repository:** [View Source Code](https://github.com/akshathab23/Agrilink)
 
 ---
 
