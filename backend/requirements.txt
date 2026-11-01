@@ -1,0 +1,8 @@
+flask
+flask-cors
+pandas
+pyjwt
+waitress
+gunicorn; sys_platform != 'win32'
+werkzeug
+

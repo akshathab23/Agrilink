@@ -1,0 +1,40 @@
+import pandas as pd
+from pathlib import Path
+
+f = Path("backend/data/raw/agmarknet_sample.csv")
+df = pd.read_csv(f)
+
+print("="*60)
+print("DATASET VERIFICATION REPORT")
+print("="*60)
+print(f"File location    : {f.resolve()}")
+print(f"File size        : {f.stat().st_size / 1024 / 1024:.2f} MB")
+print(f"Total rows       : {len(df):,}")
+print(f"Total columns    : {len(df.columns)}")
+print(f"Columns          : {list(df.columns)}")
+print()
+states = sorted(df["State"].dropna().unique())
+print(f"States ({len(states)}):")
+for s in states:
+    pct = (df["State"]==s).sum()/len(df)*100
+    print(f"  {s:<30} {pct:5.1f}%")
+print()
+comms = sorted(df["Commodity"].dropna().unique().tolist())
+print(f"Commodities ({len(comms)}):")
+for c in comms:
+    print(f"  {c}")
+print()
+print("Date range:")
+dates = pd.to_datetime(df["Arrival_Date"], format="%d/%m/%Y")
+print(f"  From : {dates.min().date()}")
+print(f"  To   : {dates.max().date()}")
+print()
+print("Missing values per column:")
+print(df.isnull().sum().to_string())
+print()
+print(f"Duplicate rows   : {df.duplicated().sum():,}")
+print()
+valid = df.dropna(subset=["Min_Price","Modal_Price","Max_Price"])
+ok = ((valid["Min_Price"] <= valid["Modal_Price"]) & (valid["Modal_Price"] <= valid["Max_Price"])).all()
+print(f"Price sanity (Min<=Modal<=Max): {'PASS' if ok else 'FAIL'}")
+print("="*60)
