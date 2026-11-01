@@ -1,5 +1,7 @@
 # 🌾 AgriLink: Transparent Digital Agricultural Marketplace
 
+🌐 **Live Demo:** [AgriLink – Visit Website](https://agrilink-pn3i.onrender.com)
+
 > A secure, role-based agricultural platform connecting **Farmers**, **Village Collection Centre Operators**, and **Commodity Buyers** through verified crop listings, standardized physical quality grading, automated demand-supply matching, and transparent mandi price discovery.
 
 ---
@@ -315,8 +317,7 @@ AgriLink implements security-in-depth principles across all layers:
 
 ## 🌐 Deployment Status
 
-- **Current Status:** **Pre-Deployment / Staging Ready**.  
-  *The application has not yet been deployed to public production.*
+- **Current Status:** **Live in Production** on Render: [https://agrilink-pn3i.onrender.com](https://agrilink-pn3i.onrender.com)
 - **Production Architecture (Render / Linux PaaS):**
   The repository includes a production launcher ([start.sh](file:///c:/Users/aksha/OneDrive/Documents/Desktop/Agrilink/start.sh)) engineered for unified single-service hosting:
   - Runs safe schema migrations automatically on startup.
