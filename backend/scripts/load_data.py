@@ -1,22 +1,23 @@
+import os
 import sqlite3
 import pandas as pd
 from pathlib import Path
 
 # Paths
 BASE_DIR = Path(__file__).parent.parent
-DB_PATH = BASE_DIR / "data" / "agrilink.db"
-CSV_PATH = BASE_DIR / "data" / "raw" / "agmarknet_sample.csv"
+DB_PATH = Path(os.environ.get("DB_PATH", BASE_DIR / "data" / "agrilink.db"))
+CSV_PATH = Path(os.environ.get("CSV_PATH", BASE_DIR / "data" / "raw" / "agmarknet_sample.csv"))
 SCHEMA_PATH = BASE_DIR / "schema.sql"
 
-def init_db():
-    print("Initializing database...")
-    # Ensure data directory exists
-    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+def init_db(db_path=None):
+    target_db = Path(db_path) if db_path else DB_PATH
+    print(f"Initializing database schema at {target_db}...")
+    target_db.parent.mkdir(parents=True, exist_ok=True)
     
-    with sqlite3.connect(DB_PATH) as conn:
-        with open(SCHEMA_PATH, "r") as f:
+    with sqlite3.connect(target_db) as conn:
+        with open(SCHEMA_PATH, "r", encoding="utf-8") as f:
             conn.executescript(f.read())
-    print("Database schema created successfully.")
+    print("Database schema verified successfully.")
 
 def load_and_clean_data():
     print(f"Reading CSV from {CSV_PATH}...")
@@ -65,9 +66,10 @@ def load_and_clean_data():
     
     return df_cleaned, original_rows, duplicates_removed, final_rows
 
-def populate_database(df):
-    print("Connecting to database to insert records...")
-    with sqlite3.connect(DB_PATH) as conn:
+def populate_database(df, db_path=None, clear_existing=False):
+    target_db = Path(db_path) if db_path else DB_PATH
+    print(f"Connecting to database {target_db} to insert records...")
+    with sqlite3.connect(target_db) as conn:
         cursor = conn.cursor()
         
         # Insert unique markets
@@ -93,8 +95,9 @@ def populate_database(df):
         # Prepare prices data
         prices_data = df[['market_id', 'Commodity', 'Variety', 'Grade', 'Arrival_Date', 'Min_Price', 'Max_Price', 'Modal_Price']]
         
-        # Clear existing prices if running multiple times (optional for idempotency)
-        cursor.execute("DELETE FROM market_prices")
+        # Clear existing prices ONLY if explicitly requested
+        if clear_existing:
+            cursor.execute("DELETE FROM market_prices")
         
         # Insert prices
         cursor.executemany(
@@ -106,10 +109,35 @@ def populate_database(df):
         conn.commit()
     print("Data successfully loaded into SQLite database.")
 
-if __name__ == "__main__":
-    init_db()
-    cleaned_df, orig_rows, dupes_removed, final_rows = load_and_clean_data()
-    populate_database(cleaned_df)
+def seed_dataset_if_empty(db_path=None, force=False):
+    """
+    Safely seeds the original agricultural dataset only when market_prices is empty.
+    If market_prices already has records, skips loading to prevent unnecessary startup delays.
+    Never modifies or touches farmer, buyer, listing, offer, or user account tables.
+    """
+    target_db = Path(db_path) if db_path else DB_PATH
+    init_db(target_db)
     
-    print("\n[SUCCESS] Setup Complete.")
-    print("You can verify by running: sqlite3 backend/data/agrilink.db \"SELECT COUNT(*) FROM market_prices;\"")
+    with sqlite3.connect(target_db) as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM market_prices")
+        count = cursor.fetchone()[0]
+        
+    if count > 0 and not force:
+        print(f"==> Database at {target_db} already contains {count:,} market price records. Skipping seed.")
+        return False
+        
+    if not CSV_PATH.exists():
+        print(f"WARNING: Agricultural dataset not found at {CSV_PATH}. Cannot seed market prices.")
+        return False
+        
+    print(f"==> market_prices table is empty. Loading dataset from {CSV_PATH}...")
+    cleaned_df, orig_rows, dupes_removed, final_rows = load_and_clean_data()
+    populate_database(cleaned_df, db_path=target_db, clear_existing=force)
+    print(f"==> Successfully initialized {final_rows:,} market price records.")
+    return True
+
+if __name__ == "__main__":
+    import sys
+    force_reload = "--force" in sys.argv
+    seed_dataset_if_empty(force=force_reload)
