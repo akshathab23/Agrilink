@@ -32,13 +32,12 @@ desktop.ini
 .vscode/
 .idea/
 
-# SQLite temporary and lock files
+# SQLite database files and backups (kept strictly local / on persistent disk)
+*.db
+backend/data/*.db
+backend/data/backups/
 *.db-journal
 *.db-wal
 *.db-shm
-
-# Database backup archives (strictly local, never committed to git)
-backend/data/backups/
-*_backup*.db
 *.db.bak
 

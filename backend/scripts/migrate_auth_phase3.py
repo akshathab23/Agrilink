@@ -5,9 +5,20 @@ from pathlib import Path
 DB_PATH = Path(os.environ.get("DB_PATH", Path(__file__).parent.parent / "data" / "agrilink.db"))
 
 def run_migration(db_path=DB_PATH):
+    # Ensure database directory exists (e.g. for mounted persistent disk volumes)
+    Path(db_path).parent.mkdir(parents=True, exist_ok=True)
+
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     
+    # 0. Ensure base schema tables exist if starting on a fresh/empty volume
+    # schema.sql contains strictly CREATE TABLE IF NOT EXISTS and CREATE INDEX IF NOT EXISTS,
+    # ensuring existing tables and data are never overwritten or deleted.
+    schema_path = Path(__file__).parent.parent / "schema.sql"
+    if schema_path.exists():
+        with open(schema_path, "r", encoding="utf-8") as f:
+            cursor.executescript(f.read())
+
     # 1. Ensure users table exists with proper unique constraints
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
